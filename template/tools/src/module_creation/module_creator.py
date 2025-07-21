@@ -10,8 +10,12 @@ class ModuleCreator:
         self.module_name = module_name
         self.module_type = module_type
         self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
         self.module_path = os.path.join(self.project_root, self.module_type, self.module_name)
-        self.templates_path = os.path.join(self.project_root, ".vpm", "templates")
+        if self.module_type == "app":
+            self.module_path = os.path.join(self.project_root, "app")
+
+        self.templates_path = os.path.join(self.project_root, ".resources", "templates")
         self.file_synchronizer = FileSynchronizer(self.module_path)
         self.gtest = use_gtest
 
@@ -72,12 +76,12 @@ class ModuleCreator:
                     "contact_email": project_info.get("contact_email")
                 }
             },
-            f"include/{self.module_name}/module.h": {
+            "include/module.h": {
                 "template": os.path.join("c++", "module_template.h.jinja"),
                 "params": {"target_name": self.module_name}
             },
             "CMakeLists.txt": {
-                "template": os.path.join("cmake",f"#{self.module_type}_CMakeLists.txt.jinja"),
+                "template": os.path.join("cmake",f"{self.module_type}_CMakeLists.txt.jinja"),
                 "params": {
                     "target_name": self.module_name,
                     "sources": f"{self.module_name.upper().replace('-', '_')}_SOURCES",
@@ -85,14 +89,14 @@ class ModuleCreator:
                     "resources": f"{self.module_name.upper().replace('-', '_')}_RESOURCES"
                 }
             },
-            f"src/{self.module_name}/main.cpp": {
+            "src/main.cpp": {
                 "template": os.path.join("c++", "main_template.cpp.jinja"),
                 "params": {
                     "target_name": self.module_name,
                     "app": self.module_type == "app"
                 }
             },
-            f"test/{self.module_name}/CMakeLists.txt": {
+            "test/CMakeLists.txt": {
                 "template": os.path.join("cmake", "test_CMakeLists.txt.jinja"),
                 "params": {
                     "test_target": self.module_name+"_test",
@@ -101,7 +105,7 @@ class ModuleCreator:
 
                 }
             },
-            f"test/{self.module_name}/test_main.cpp": {
+            "test/test_main.cpp": {
                 "template": os.path.join("c++", "test_main_template.cpp.jinja"),
                 "params": {
                     "target_name": self.module_name,

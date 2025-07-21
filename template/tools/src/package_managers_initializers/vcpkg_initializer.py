@@ -15,7 +15,7 @@ class VCPKGInitializer(PackageManager):
 
     def __init__(self, project_name: str = "my_project"):
         super().__init__("vcpkg")
-        self.project_name = project_name
+        self.project_name = project_name.lower().replace(" ", "_")
 
     def create_vcpkg_json(self):
         return os.system(f"vcpkg new --application --name {self.project_name} --version 0.1.0")
