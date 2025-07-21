@@ -9,7 +9,7 @@ configure_build({{ target_name }})
 add_library({{ target_name }}  {{"${" + sources + "}"}} {{"${" + headers + "}"}} {{"${" + resources + "}"}})
 
 # Include headers directory
-target_include_directories({{ target_name }} PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/include/{{ target_name }})
+target_include_directories({{ target_name }} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/{{ target_name }})
 
 # Link libraries
 #target_link_libraries({{ target_name }} PRIVATE)

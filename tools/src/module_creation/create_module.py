@@ -51,8 +51,8 @@ def create(name: str, module_type: str, gtest: bool):
                 with open(cmake_file_path, 'a') as cmake_file:
                     cmake_file.write(f"\nadd_subdirectory({name})\n")
         else:
-            console.print(f"[bold red]CMakeLists.txt not found at {cmake_file_path}.[/bold red]")
-            return
+            with open(cmake_file_path, 'w') as cmake_file:
+                cmake_file.write(f"add_subdirectory({name})\n")
 
         console.print(
             f"[green]Module '{name}' of type '{module_type}' created successfully at {module_creator_instance.module_path}[/green]")

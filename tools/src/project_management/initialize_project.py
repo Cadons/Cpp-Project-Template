@@ -4,6 +4,8 @@ import click
 from rich import print
 from rich.prompt import Confirm
 from jinja2 import Environment, FileSystemLoader
+
+from tools.src.module_creation.module_creator import ModuleCreator
 from tools.src.package_managers_initializers.package_manager import PackageManager
 from project_configuration import ProjectConfig
 
@@ -55,7 +57,7 @@ def cli():
 def init(name: str, org: str, package_manager: str, force: bool):
     """Initialize a new project."""
     try:
-        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
         os.chdir(root_dir)
         project_json_path = os.path.join(os.getcwd(), PROJECT_FILE_NAME)
 
@@ -87,12 +89,17 @@ def init(name: str, org: str, package_manager: str, force: bool):
         print(f"[bold green]Project configuration saved to[/bold green] {project_json_path}")
 
         # Generate CMakeLists.txt
-        cmake_template_path = os.path.join(os.path.dirname(__file__), "..", ".vpm", "templates", "cmake", "CMakeLists.txt.jinja")
+        cmake_template_path = os.path.join(os.path.dirname(__file__), "..","..","..", ".resources", "templates", "cmake", "CMakeLists.txt.jinja")
         cmake_output_path = os.path.join(os.getcwd(), "CMakeLists.txt")
         generate_cmakelists(cmake_template_path, cmake_output_path, project_config)
 
         initializer.configure_cmake_presets()
         print("[bold green]Project initialized successfully.[/bold green]")
+
+        #create app folder structure
+        app_dir = os.path.join(os.getcwd(), "app")
+        module_creator = ModuleCreator(name, "app", True)
+        module_creator.create_module()
 
     except Exception as e:
         print(f"[bold red]Error initializing project: {str(e)}[/bold red]")
