@@ -15,7 +15,8 @@ TOOLS: Dict[str, Tuple[str, str]] = {
     'module': ('create_module', 'cli'),
     'source': ('create_source_file', 'cli'),
     'init': ('initialize_project', 'cli'),
-    'update': ('update_files', 'cli')
+    'update': ('update_files', 'cli'),
+    'configure': ('configure_project', 'cli'),
 }
 
 # --- Path setup ---

@@ -5,10 +5,10 @@ class FileSynchronizer:
     def __init__(self, module_path):
         self.module_path= module_path
         self.module_name = os.path.basename(module_path)
-        self.header_variable_name = f"{self.module_name.upper().replace('-', '_')}_HEADERS"
-        self.source_variable_name = f"{self.module_name.upper().replace('-', '_')}_SOURCES"
-        self.test_source_variable_name = f"{self.module_name.upper().replace('-', '_')}_TEST_SOURCES"
-        self.resource_variable_name = f"{self.module_name.upper().replace('-', '_')}_RESOURCES"
+        self.header_variable_name = f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_HEADERS"
+        self.source_variable_name = f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_SOURCES"
+        self.test_source_variable_name = f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_TEST_SOURCES"
+        self.resource_variable_name = f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_RESOURCES"
         self.header_files = []
         self.source_files = []
         self.resource_files = []
@@ -26,7 +26,7 @@ class FileSynchronizer:
 
         base_path = self.module_path if relative_to_module else os.path.join(self.module_path, folder)
         output = [os.path.relpath(file, base_path) for file in output]
-
+        output = [file.replace('\\', '/') for file in output]
         result = list(set(output))
         result.sort()
         return result
@@ -41,7 +41,7 @@ class FileSynchronizer:
         self.source_files = self.scan_folder(self.source_file_extensions, 'src/',
                                              relative_to_module=True)
         self.test_source_files = self.scan_folder(self.test_source_files, 'test/',
-                                                  relative_to_module=True)
+                                                  relative_to_module=False)
         self.resource_files = self.scan_folder(self.resource_file_extensions, 'resources/',
                                                relative_to_module=True)
 

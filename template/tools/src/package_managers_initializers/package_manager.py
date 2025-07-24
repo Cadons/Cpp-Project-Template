@@ -15,21 +15,7 @@ class PackageManager(ABC):
 
     def __init__(self, name: str):
         self.name = name
-        self.vcpkg_location = "${VCPKG_ROOT}"
-        if os.name != 'nt':
-            vcpkg_path = os.popen("which vcpkg").read().strip()
-            if vcpkg_path:
-                self.find_vcpkg_root(vcpkg_path)
-            else:
-                console.print("[bold red]VCPKG not found. Please ensure vcpkg is installed and configured correctly.[/bold red]")
-                exit(1)
 
-    def find_vcpkg_root(self, vcpkg_path):
-        if vcpkg_path:
-            vcpkg_dir = os.path.dirname(os.path.abspath(vcpkg_path))
-            self.vcpkg_location = vcpkg_dir
-            return self.vcpkg_location
-        return None
 
     @abstractmethod
     def initialize(self):
@@ -37,6 +23,18 @@ class PackageManager(ABC):
 
     @abstractmethod
     def configure_cmake_presets(self):
+        pass
+    @abstractmethod
+    def get_toolchain_file(self):
+        """
+        Returns the path to the toolchain file for this package manager.
+        """
+        pass
+    @abstractmethod
+    def get_parent_preset(self):
+        """
+        Returns the name of the parent preset for this package manager.
+        """
         pass
 
     @staticmethod
@@ -93,7 +91,7 @@ class PackageManager(ABC):
             generators_start += 2
         except StopIteration:
             return []
-
+        #exclude IDE generators
         # Parse generator entries
         for line in lines[generators_start:]:
             if not line.strip():
@@ -102,13 +100,12 @@ class PackageManager(ABC):
             match = re.match(r'^\s*(\S.+?)\s+=', line)
             if not match:
                 continue
-
             generator = match.group(1).replace("*", "").strip()
             generators.append(generator)
 
         return generators
-
-    def generate_cmake_user_presets(self, inherit_from):
+    @staticmethod
+    def generate_cmake_user_presets(inherit_from="",toolchain_file=None):
         generators = PackageManager.list_generators()
         if not generators:
             console.print("[bold red]No CMake generators found.[/bold red]")
@@ -130,37 +127,40 @@ class PackageManager(ABC):
         selected_preset = None
         while selected_preset is None:
             try:
-                selected_idx = IntPrompt.ask("Select generator number", choices=[str(i) for i in range(1, len(generators) + 1)])
+                selected_idx = IntPrompt.ask("Select generator number", default=1, show_default=False)
                 selected_preset = generators[selected_idx - 1]
             except (ValueError, IndexError):
                 console.print("[red]Invalid selection. Please choose a valid number.[/red]")
 
-        for generator in generators:
-            cmake_presets_json["configurePresets"].append({
-                "name": generator,
-                "hidden": selected_preset != generator,
-                "generator": generator,
-                "inherits": inherit_from,
-                "cacheVariables": {
-                    "CMAKE_TOOLCHAIN_FILE": f"{self.vcpkg_location}/scripts/buildsystems/vcpkg.cmake",
-                }
-            })
-            cmake_presets_json["buildPresets"].append({
-                "name": f"{generator} Debug",
-                "hidden": selected_preset != generator,
-                "configurePreset": generator,
-                "configuration": "Debug",
-                "jobs": cpus,
-            })
-            cmake_presets_json["buildPresets"].append({
-                "name": f"{generator} Release",
-                "hidden": selected_preset != generator,
-                "configurePreset": generator,
-                "configuration": "Release",
-                "jobs": cpus,
-            })
+        generator = selected_preset
+        generator_name = generator.replace(" ", "_").replace("-", "_")
+        cmake_presets_json["configurePresets"].append({
+            "name": generator_name,
+            "hidden": selected_preset != generator,
+            "generator": generator,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "inherits": inherit_from
+        })
+        if toolchain_file:
+            cmake_presets_json["configurePresets"][-1]["cacheVariables"]={
+                "CMAKE_TOOLCHAIN_FILE": toolchain_file
+            }
+        cmake_presets_json["buildPresets"].append({
+            "name": f"{generator_name} Debug",
+            "hidden": selected_preset != generator,
+            "configurePreset": generator_name,
+            "configuration": "Debug",
+            "jobs": cpus,
+        })
+        cmake_presets_json["buildPresets"].append({
+            "name": f"{generator_name} Release",
+            "hidden": selected_preset != generator,
+            "configurePreset": generator_name,
+            "configuration": "Release",
+            "jobs": cpus,
+        })
 
-        cmake_user_presets_path = os.path.join(os.getcwd(), "CMakeUserPresets.json")
+        cmake_user_presets_path = os.path.join(__file__,"..","..","..","..", "CMakeUserPresets.json")
         import json
         with open(cmake_user_presets_path, 'w') as f:
             json.dump(cmake_presets_json, f, indent=2)

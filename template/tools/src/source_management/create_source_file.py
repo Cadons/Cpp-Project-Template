@@ -112,7 +112,7 @@ def create_class_files(name: str, namespace: str, output_dir: str, creator: Modu
     # Create header file
     header_path = os.path.join(header_output_dir, header_filename)
     creator.create_file_from_template(
-        os.path.join("c++", "class_template.h.jinja"),
+        "c++/class_template.h.jinja",
         header_path,
         **template_params
     )
@@ -120,7 +120,7 @@ def create_class_files(name: str, namespace: str, output_dir: str, creator: Modu
     # Create source file
     source_path = os.path.join(source_output_dir, f"{to_pascal_case(name)}.cpp")
     creator.create_file_from_template(
-        os.path.join("c++", "class_template.cpp.jinja"),
+        "c++/class_template.cpp.jinja",
         source_path,
         **template_params
     )
@@ -151,12 +151,12 @@ def create_test_files(template_type: str, name: str, namespace: str, output_dir:
     elif template_type == "gtest_parametrized":
         template_name = "gtest_parametrized_template.cpp.jinja"
     else:
-        template_name = "gtest_template.cpp.jinja"
+        template_name = "gtest_simple_template.cpp.jinja"
 
     console.print("\n[bold blue]Creating test files...[/bold blue]")
     test_path = os.path.join(test_output_dir, f"{to_pascal_case(name)}Test.cpp")
     creator.create_file_from_template(
-        os.path.join("gtest", template_name),
+       f"gtest/{template_name}",
         test_path,
         **test_params
     )
@@ -165,9 +165,12 @@ def create_test_files(template_type: str, name: str, namespace: str, output_dir:
 def create_qrc_file(name: str, output_dir: str, creator: ModuleCreator):
     """Create Qt resource file."""
     console.print("\n[bold blue]Creating QRC file...[/bold blue]")
-    qrc_path = os.path.join(output_dir, f"{to_pascal_case(name)}.qrc")
+    if not os.path.exists(os.path.join(output_dir,"resources")):
+        os.makedirs(os.path.join(output_dir, "resources"), exist_ok=True)
+
+    qrc_path = os.path.join(output_dir,"resources", f"{to_pascal_case(name)}.qrc")
     creator.create_file_from_template(
-        os.path.join("qt", "qrc_template.qrc.jinja"),
+       "qt/qrc_template.qrc.jinja",
         qrc_path,
         prefix=name,
         create_examples=True

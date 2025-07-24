@@ -1,6 +1,5 @@
 {% if use_gtest %}
 #include <gtest/gtest.h>
-#include "{{ header_filename }}"
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

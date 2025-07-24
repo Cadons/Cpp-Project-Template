@@ -42,3 +42,5 @@ if [ -f "requirements.txt" ]; then
 else
     echo "requirements.txt not found. Skipping installation."
 fi
+# Keep the virtual environment active after script ends
+$SHELL

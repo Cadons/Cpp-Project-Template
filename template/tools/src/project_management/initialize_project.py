@@ -98,8 +98,17 @@ def init(name: str, org: str, package_manager: str, force: bool):
 
         #create app folder structure
         app_dir = os.path.join(os.getcwd(), "app")
-        module_creator = ModuleCreator(name, "app", True)
+        module_creator = ModuleCreator("app", "app", True)
         module_creator.create_module()
+        #create lib folder structure
+        lib_dir = os.path.join(os.getcwd(), "lib")
+        #create .gitkeep in lib
+        os.makedirs(lib_dir, exist_ok=True)
+        #create CMakeLists.txt
+        cmake_lib_path = os.path.join(lib_dir, "CMakeLists.txt")
+        if not os.path.exists(cmake_lib_path):
+            with open(cmake_lib_path, 'w') as f:
+                f.write("# CMakeLists.txt for lib\n")
 
     except Exception as e:
         print(f"[bold red]Error initializing project: {str(e)}[/bold red]")

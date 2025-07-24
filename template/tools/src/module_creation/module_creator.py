@@ -20,14 +20,24 @@ class ModuleCreator:
         self.gtest = use_gtest
 
     def _get_folder_structure(self):
-        return {
-            "src": ["src", self.module_name],
-            "include": ["include", self.module_name],
-            "test": ["test"],
-            "docs": ["docs"],
-            ".cmake": [".cmake"],
-            "resources": ["resources"]
-        }
+        if self.module_type == "lib":
+            return {
+                "src": ["src", self.module_name],
+                "include": ["include", self.module_name],
+                "test": ["test"],
+                "docs": ["docs"],
+                ".cmake": [".cmake"],
+                "resources": ["resources"]
+            }
+        else:
+            return {
+                "src": ["src"],
+                "include": ["include"],
+                "test": ["test"],
+                "docs": ["docs"],
+                ".cmake": [".cmake"],
+                "resources": ["resources"]
+            }
 
     def _create_module_json(self):
         module_json = {
@@ -77,27 +87,27 @@ class ModuleCreator:
                 }
             },
             "include/module.h": {
-                "template": os.path.join("c++", "module_template.h.jinja"),
+                "template": "c++/module_template.h.jinja",
                 "params": {"target_name": self.module_name}
             },
             "CMakeLists.txt": {
-                "template": os.path.join("cmake",f"{self.module_type}_CMakeLists.txt.jinja"),
+                "template": f"cmake/{self.module_type}_CMakeLists.txt.jinja",
                 "params": {
                     "target_name": self.module_name,
-                    "sources": f"{self.module_name.upper().replace('-', '_')}_SOURCES",
-                    "headers": f"{self.module_name.upper().replace('-', '_')}_HEADERS",
-                    "resources": f"{self.module_name.upper().replace('-', '_')}_RESOURCES"
+                    "sources": f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_SOURCES",
+                    "headers": f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_HEADERS",
+                    "resources": f"{self.module_name.upper().replace('-', '_').replace(' ','_')}_RESOURCES"
                 }
             },
             "src/main.cpp": {
-                "template": os.path.join("c++", "main_template.cpp.jinja"),
+                "template": "c++/main_template.cpp.jinja",
                 "params": {
                     "target_name": self.module_name,
                     "app": self.module_type == "app"
                 }
             },
             "test/CMakeLists.txt": {
-                "template": os.path.join("cmake", "test_CMakeLists.txt.jinja"),
+                "template": "cmake/test_CMakeLists.txt.jinja",
                 "params": {
                     "test_target": self.module_name+"_test",
                     "use_gtest": self.gtest,
@@ -106,14 +116,14 @@ class ModuleCreator:
                 }
             },
             "test/test_main.cpp": {
-                "template": os.path.join("c++", "test_main_template.cpp.jinja"),
+                "template": "c++/test_main_template.cpp.jinja",
                 "params": {
                     "target_name": self.module_name,
                     "use_gtest": self.gtest
                 }
             },
             "docs/Doxyfile":{
-                "template": os.path.join("docs", "doxyfile_template.jinja"),
+                "template": "docs/doxyfile_template.jinja",
                 "params": {
                     "project_name": self.module_name,
                 }

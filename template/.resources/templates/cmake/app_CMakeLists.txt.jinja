@@ -17,7 +17,7 @@ target_include_directories({{ target_name }} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 # Enable testing if tests exist
 include(CTest)
 if(BUILD_TESTING)
-    add_subdirectory(test/{{ target_name }})
+    add_subdirectory(test)
 endif()
 # Install target
 configure_install({{ target_name }})

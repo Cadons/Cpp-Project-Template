@@ -17,6 +17,32 @@ class VCPKGInitializer(PackageManager):
         super().__init__("vcpkg")
         self.project_name = project_name.lower().replace(" ", "_")
 
+        self.vcpkg_location = "${VCPKG_ROOT}"
+        if os.name != 'nt':
+            vcpkg_path = os.popen("which vcpkg").read().strip()
+            if vcpkg_path:
+                self.find_vcpkg_root(vcpkg_path)
+            else:
+                console.print(
+                    "[bold red]VCPKG not found. Please ensure vcpkg is installed and configured correctly.[/bold red]")
+                exit(1)
+        else:
+            vcpkg_path = os.popen("where vcpkg").read().strip()
+            if vcpkg_path:
+                self.find_vcpkg_root(vcpkg_path)
+            else:
+                console.print(
+                    "[bold red]VCPKG not found. Please ensure vcpkg is installed and configured correctly.[/bold red]")
+                exit(1)
+        self.toolchain_file =f"{self.vcpkg_location}/scripts/buildsystems/vcpkg.cmake"
+        self.parent_preset = "vcpkg-default"
+
+    def find_vcpkg_root(self, vcpkg_path):
+        if vcpkg_path:
+            vcpkg_dir = os.path.dirname(os.path.abspath(vcpkg_path))
+            self.vcpkg_location = vcpkg_dir.replace("\\", "/")
+            return self.vcpkg_location
+        return None
     def create_vcpkg_json(self):
         return os.system(f"vcpkg new --application --name {self.project_name} --version 0.1.0")
 
@@ -41,7 +67,7 @@ class VCPKGInitializer(PackageManager):
             vcpkg_data.update({
                 "name": self.project_name,
                 "version": "0.1.0",
-                "dependencies": []
+                "dependencies": ["gtest"]
             })
 
             with open(vcpkg_json_path, 'w') as file:
@@ -60,15 +86,12 @@ class VCPKGInitializer(PackageManager):
                 {
                     "name": "vcpkg-default",
                     "hidden": True,
-                    "binaryDir": "${sourceDir}/build/",
-                    "cacheVariables": {
-                        "CMAKE_TOOLCHAIN_FILE": f"{self.vcpkg_location}/scripts/buildsystems/vcpkg.cmake"
-                    }
+                    "binaryDir": "${sourceDir}/build/"
                 }
             ]
         }
 
-        cmake_presets_path = os.path.join(os.getcwd(), self.CMAKE_PRESETS_FILE)
+        cmake_presets_path = os.path.join(__file__,"..","..","..","..", self.CMAKE_PRESETS_FILE)
         if not os.path.exists(cmake_presets_path):
             with open(cmake_presets_path, 'w') as f:
                 json.dump(cmake_presets, f, indent=2)
@@ -76,4 +99,14 @@ class VCPKGInitializer(PackageManager):
         else:
             console.print(f"[cyan]CMake presets already exist at {cmake_presets_path}. Skipping creation.[/cyan]")
 
-        self.generate_cmake_user_presets(inherit_from="vcpkg-default")
+        self.generate_cmake_user_presets(inherit_from=self.parent_preset, toolchain_file=self.toolchain_file)
+    def get_toolchain_file(self):
+        """
+        Returns the path to the vcpkg toolchain file.
+        """
+        return self.toolchain_file
+    def get_parent_preset(self):
+        """
+        Returns the parent preset for vcpkg.
+        """
+        return self.parent_preset

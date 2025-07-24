@@ -1,4 +1,4 @@
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../.cmake/sources.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../.cmake/sources.cmake)
 {%if use_gtest%}
 #Find GoogleTest package
 find_package(GTest REQUIRED)
@@ -11,10 +11,10 @@ include_directories(
 )
 
 # Add test executable
-add_executable({{test_target}} {{sources}})
+add_executable({{test_target}} {{"${"+sources+"}"}})
 
 # Link libraries
-target_link_libraries({{test_target}} PRIVATE GTest::gtest GTest::gtest_main pthread)
+target_link_libraries({{test_target}} PRIVATE GTest::gtest)
 
 #auto discover tests
 gtest_discover_tests({{test_target}}

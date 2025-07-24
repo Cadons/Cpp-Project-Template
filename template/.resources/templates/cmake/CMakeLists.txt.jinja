@@ -32,7 +32,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Add extra cmake modules (optional)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(common OPTIONAL)
+include(Common OPTIONAL)
+include(QUtils OPTIONAL)
 
 # Testing
 include(CTest)
