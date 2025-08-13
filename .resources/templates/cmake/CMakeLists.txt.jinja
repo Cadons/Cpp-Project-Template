@@ -1,27 +1,26 @@
-message(STATUS "test-project by cadonslab - 1.0.0")
-cmake_minimum_required(VERSION 3.23)
+include(cmake/common.cmake)
+message(STATUS "{{ project_name}} by {{ org_name | default('UnknownOrg') }} - {{ project_version | default('1.0.0') }}")
+cmake_minimum_required(VERSION {{ cmake_min_version | default("3.23") }})
 
-project(test-project
-    VERSION 1.0.0
-    DESCRIPTION "A monorepo project"
+project({{ project_name }}
+    VERSION {{ project_version | default("1.0.0") }}
+    DESCRIPTION "{{ project_description | default('Monorepo project') }}"
     LANGUAGES CXX
 )
 
 # Organization info
-set(PROJECT_ORG_NAME "cadonslab")
-set(PROJECT_ORG_URL "https://example.com")
+set(PROJECT_ORG_NAME "{{ org_name | default('UnknownOrg') }}")
+set(PROJECT_ORG_URL "{{ org_url | default('https://example.com') }}")
 
 # Prefer Ninja if not explicitly specified
-
+{% if prefer_ninja %}
 if(NOT CMAKE_GENERATOR)
     message(STATUS "No generator specified. Consider using Ninja for faster builds.")
 endif()
-
+{% endif %}
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+configure_compiler({{ cpp_standard | default("23") }})
 
 # Default build type
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -33,14 +32,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Add extra cmake modules (optional)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(common OPTIONAL)
-
-# Compiler warnings
-if(MSVC)
-    add_compile_options(/W4 /WX)
-else()
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
-endif()
+include(Common OPTIONAL)
+include(QUtils OPTIONAL)
 
 # Testing
 include(CTest)
@@ -54,7 +47,6 @@ configure_file(
 )
 
 # === Add subdirectories ===
-
-add_subdirectory(app)
-
-add_subdirectory(lib)
+{% for dir in subdirs %}
+add_subdirectory({{ dir }})
+{% endfor %}
