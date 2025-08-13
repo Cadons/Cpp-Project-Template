@@ -1,17 +1,14 @@
 @echo off
 REM Check if Python is installed
-where python3 >nul 2>&1
+
+where python >nul 2>&1
 if %errorlevel% equ 0 (
-    set pythonCmd=python3
+    set pythonCmd=python
 ) else (
-    where python >nul 2>&1
-    if %errorlevel% equ 0 (
-        set pythonCmd=python
-    ) else (
-        echo Python is not installed. Please install Python to use this script.
-        exit /b 1
-    )
+    echo Python is not installed. Please install Python to use this script.
+    exit /b 1
 )
+
 
 REM Check if pip is installed
 where pip3 >nul 2>&1

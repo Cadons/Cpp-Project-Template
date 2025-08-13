@@ -21,7 +21,8 @@ class SubtreeManager:
         else:
             parent_dir = current_dir
 
-        config_path = os.path.join(parent_dir, 'project.json')
+
+        config_path = os.path.join(parent_dir,"..","..","..", 'project.json')
 
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Cannot find project.json in {parent_dir}")
@@ -268,11 +269,6 @@ def add(name: str, git_url: str, path: str, main_branch: str, staging_branch: st
 
     if '..' in path:
         console.print("[bold red]Error:[/bold red] Invalid path: directory traversal not allowed")
-        return
-
-    normalized_path = os.path.normpath(path)
-    if not normalized_path.startswith('lib/'):
-        console.print("[bold red]Error:[/bold red] The subtree path must be inside the 'lib/' directory")
         return
 
     manager = SubtreeManager()
