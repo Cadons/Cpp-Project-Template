@@ -110,9 +110,7 @@ function(configure_compiler cpp_standard)
                     $<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
         endif()
     else()
-        if(CMAKE_COMPILER_IS_GNUCXX AND cpp_standard EQUAL 23)
-            add_compile_options(-std=c++23)
-        endif()
+            add_compile_options(-std=c++${cpp_standard})
     endif()
 
     # Default build type
