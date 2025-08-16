@@ -79,6 +79,11 @@ function(configure_install target_name)
     install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
             DESTINATION include
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    # Install CMake configuration files for the target.
+    install(EXPORT ${target_name}Targets
+            FILE ${target_name}Targets.cmake
+            NAMESPACE ${target_name}::
+            DESTINATION lib/cmake/${target_name})
 endfunction()
 
 # Function to configure compiler settings.
