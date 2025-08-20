@@ -21,14 +21,14 @@ function(deploy_vcpkg_shared_lib TARGET_NAME FILENAME)
         set(ARCH "arm")
     elseif (PROCESSOR_LOWERCASE MATCHES "aarch64|arm64") # ARM 64-bit
         set(ARCH "arm64")
-    else()
+    else ()
         # Fail if the architecture is unsupported.
         message(FATAL_ERROR "Architecture not supported: ${CMAKE_SYSTEM_PROCESSOR}")
         return()
-    endif()
+    endif ()
 
     # Configure settings for Windows.
-    if(WIN32)
+    if (WIN32)
         set(OS_NAME "windows")
         set(TRIPLET_POSTFIX "")
         set(LIB_EXTENSION "dll")
@@ -41,19 +41,18 @@ function(deploy_vcpkg_shared_lib TARGET_NAME FILENAME)
 
     # Log the triplet being used.
     message(STATUS "Triplet: ${ARCH}-${OS_NAME}${TRIPLET_POSTFIX}")
-
-    # Define the source file path for the shared library.
-    set(SOURCE_FILE_PATH "$<IF:$<CONFIG:Debug>,${CMAKE_BINARY_DIR}/vcpkg_installed/${ARCH}-${OS_NAME}${TRIPLET_POSTFIX}/debug/${SHARED_LIB_FOLDER}/${LIB_PREFIX}${FILENAME}.${LIB_EXTENSION},${PROJECT_VCPKG_INSTALLED_ROOT}/${ARCH}-${OS_NAME}${TRIPLET_POSTFIX}/${SHARED_LIB_FOLDER}/${LIB_PREFIX}${FILENAME}.${LIB_EXTENSION}>")
-
+    set(DEBUG_PATH "${CMAKE_BINARY_DIR}/vcpkg_installed/${ARCH}-${OS_NAME}${TRIPLET_POSTFIX}/debug/${SHARED_LIB_FOLDER}/${LIB_PREFIX}${FILENAME}.${LIB_EXTENSION}")
+    set(RELEASE_PATH "${CMAKE_BINARY_DIR}/vcpkg_installed/${ARCH}-${OS_NAME}${TRIPLET_POSTFIX}/${SHARED_LIB_FOLDER}/${LIB_PREFIX}${FILENAME}.${LIB_EXTENSION}")
+    set(SOURCE_FILE_PATH "$<IF:$<CONFIG:Debug>,${DEBUG_PATH},${RELEASE_PATH}>")
     # Get the target type (e.g., executable, library).
     get_target_property(TARGET_TYPE ${TARGET_NAME} TYPE)
 
     # Define the destination path for the shared library.
-    if(WIN32)
+    if (WIN32)
         set(DESTINATION_PATH "${CMAKE_BINARY_DIR}/build/${TARGET_NAME}/${SHARED_LIB_FOLDER}/$<IF:$<CONFIG:Debug>,Debug,Release>/${LIB_PREFIX}${FILENAME}.${LIB_EXTENSION}")
-    else()
+    else ()
         set(DESTINATION_PATH "${CMAKE_BINARY_DIR}/build/${TARGET_NAME}/${SHARED_LIB_FOLDER}/${LIB_PREFIX}${FILENAME}.${LIB_EXTENSION}")
-    endif()
+    endif ()
 
     # Add a custom command to copy the shared library after the target is built.
     add_custom_command(TARGET ${TARGET_NAME} POST_BUILD

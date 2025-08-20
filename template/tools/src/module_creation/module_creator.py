@@ -128,6 +128,13 @@ class ModuleCreator:
                     "project_name": self.module_name,
                 }
             }
+            ,
+            "config.h.in":{
+                "template": "c++/config.h.in.jinja",
+                "params": {
+                    "project_name": self.module_name.upper()
+                }
+            }
 
         }
 

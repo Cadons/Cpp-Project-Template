@@ -13,7 +13,7 @@ class FileSynchronizer:
         self.source_files = []
         self.resource_files = []
         self.header_file_extensions = ['.h', '.hpp']
-        self.source_file_extensions = ['.cpp', '.c', '.cc', '.cxx', '.mm']
+        self.source_file_extensions = ['.cpp', '.c', '.cc', '.cxx']
         self.test_source_files = ['.cpp', '.h', '.hpp']
         self.resource_file_extensions = ['.qrc']
 

@@ -1,0 +1,70 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "ci-linux",
+            "hidden": false,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/linux",
+            "inherits": "vcpkg-default",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "x64-linux"
+            }
+        },
+        {
+            "name": "ci-osx",
+            "hidden": false,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/osx",
+            "inherits": "vcpkg-default",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "/Users/Shared/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "arm64-osx"
+            }
+        },
+        {
+            "name": "ci-win",
+            "hidden": false,
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/build/win",
+            "inherits": "vcpkg-default",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "D:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            }
+        }
+    ],
+
+    "buildPresets": [
+        {
+            "name": "ci-linux-debug",
+            "configurePreset": "ci-linux",
+            "configuration": "Debug"
+        },
+        {
+            "name": "ci-linux-release",
+            "configurePreset": "ci-linux",
+            "configuration": "Release"
+        },
+        {
+            "name": "ci-osx-debug",
+            "configurePreset": "ci-osx",
+            "configuration": "Debug"
+        },
+        {
+            "name": "ci-osx-release",
+            "configurePreset": "ci-osx",
+            "configuration": "Release"
+        },
+        {
+            "name": "ci-win-debug",
+            "configurePreset": "ci-win",
+            "configuration": "Debug"
+        },
+        {
+            "name": "ci-win-release",
+            "configurePreset": "ci-win",
+            "configuration": "Release"
+        }
+    ]
+}
