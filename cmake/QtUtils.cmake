@@ -75,6 +75,11 @@ function(auto_deploy_qt target_name)
         # Set variables for build path and target file
         set(BUILD_ROOT "${CMAKE_BINARY_DIR}")
         set(TARGET_FILE_PATH $<TARGET_FILE:${target_name}>)
+        if (QT_TOOLS_DIR)
+            set(QT_TOOLS_DIR "${QT_TOOLS_DIR}")
+        else()
+            set(QT_TOOLS_DIR "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}") #fallback to vcpkg installed directory
+        endif()
 
         # Normalize paths for Windows
         file(TO_NATIVE_PATH "${TARGET_FILE_PATH}" TARGET_FILE_PATH)
@@ -85,7 +90,7 @@ function(auto_deploy_qt target_name)
         # Add custom command to deploy Qt after the target is built
         add_custom_command(TARGET ${target_name} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E echo "Deploying Qt for ${target_name}"
-                COMMAND cmd /c call "${CMAKE_SOURCE_DIR}/cmake/scripts/DeployWindowsQtForVcpkg.bat" "${BUILD_ROOT}" "${DEPLOYMENT_TOOL}" "${target_name}" "${QML_DIR}" "${TARGET_FILE_PATH}"
+                COMMAND cmd /c call "${CMAKE_SOURCE_DIR}/cmake/scripts/DeployWindowsQtForVcpkg.bat" "${BUILD_ROOT}" "${DEPLOYMENT_TOOL}" "${target_name}" "${QML_DIR}" $<IF:$<CONFIG:Debug>,Debug,Release> "${TARGET_FILE_PATH}" ${QT_TOOLS_DIR}
                 VERBATIM
         )
     endif()
