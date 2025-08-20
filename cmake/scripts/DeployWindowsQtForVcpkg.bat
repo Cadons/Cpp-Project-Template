@@ -13,6 +13,7 @@ set "LOCK_FILE=%BUILD_DIR%\%~3_%~5_QtDeploy.lock"
 set "TARGET_FILE_PATH=%~6"
 set "QT_TOOLS_DIR=%~7"
 
+
 if not exist "%LOCK_FILE%" (
     echo Creating lock file : "%LOCK_FILE%"
     echo. 2> "%LOCK_FILE%"
@@ -27,11 +28,13 @@ if not exist "%LOCK_FILE%" (
         set "QML_DEPLOY="
     )
 
+<<<<<<< HEAD
     echo "%QT_TOOLS_DIR%\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
                   --force-openssl ^
                   %QML_DEPLOY% ^
                   "%TARGET_FILE_PATH%"
     call "%QT_TOOLS_DIR%\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
+
          --force-openssl ^
          --qmldir "%QML_DIR%" ^
          "%TARGET_FILE_PATH%"
