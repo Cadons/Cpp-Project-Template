@@ -1,6 +1,6 @@
-# Medacta C++ Project Template
+# C++ Project Template
 
-Welcome to the **Medacta C++ Template** — a flexible and extensible starting point for developing modern C++ applications. This template streamlines project organization, dependency management, and build configuration, following a modular and maintainable structure.
+Welcome to the **C++ Template** — a flexible and extensible starting point for developing modern C++ applications. This template streamlines project organization, dependency management, and build configuration, following a modular and maintainable structure.
 
 ---
 
@@ -8,28 +8,28 @@ Welcome to the **Medacta C++ Template** — a flexible and extensible starting p
 
 * **Project Structure**
 
-  * `app/`: Contains executable targets.
-  * `lib/`: Contains libraries (static or shared).
-  * Each module includes a `test/` folder with unit tests (built as executables, but not part of `app/`).
+    * `app/`: Contains executable targets.
+    * `lib/`: Contains libraries (static or shared).
+    * Each module includes a `test/` folder with unit tests (built as executables, but not part of `app/`).
 
 * **Package Management**
 
-  * Currently supports **vcpkg**.
-  * Future support planned for **Conan** and others.
+    * Currently supports **vcpkg**.
+    * Future support planned for **Conan** and others.
 
 * **Tooling**
 
-  * Built-in toolset to:
+    * Built-in toolset to:
 
-    * Create new modules
-    * Add new source files
-    * Synchronize with Git (using subtrees)
+        * Create new modules
+        * Add new source files
+        * Synchronize with Git (using subtrees)
 
 * **Build System**
 
-  * CMake-based
-  * Source list synchronization (no globbing)
-  * Optional support for Qt and Vcpkg integrations
+    * CMake-based
+    * Source list synchronization (no globbing)
+    * Optional support for Qt and Vcpkg integrations
 
 ---
 
