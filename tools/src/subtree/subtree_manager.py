@@ -281,4 +281,8 @@ def list_cmd():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD:template/tools/src/subtree/subtree_manager.py
     cli()
+=======
+    cli()
+>>>>>>> 05f2d7055510a1ed6487ab42c905089fc990f267:tools/src/subtree/subtree_manager.py

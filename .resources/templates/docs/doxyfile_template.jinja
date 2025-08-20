@@ -1,12 +1,20 @@
+# Doxyfile for {{ project_name }}
+# Generated for VPM Project
 
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "{{ project_name }}"
+<<<<<<< HEAD:template/.resources/templates/docs/doxyfile_template.jinja
 PROJECT_NUMBER         = "{{ project_version }}"
 PROJECT_BRIEF          = "{{ project_description }}"
 OUTPUT_DIRECTORY       = out
+=======
+PROJECT_NUMBER         = "0.1.0"
+PROJECT_BRIEF          = "{{ project_name }} documentation"
+OUTPUT_DIRECTORY       = docs
+>>>>>>> 05f2d7055510a1ed6487ab42c905089fc990f267:.resources/templates/docs/doxyfile_template.jinja
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
 
@@ -24,11 +32,10 @@ EXTRACT_ANON_NSPACES  = YES
 #---------------------------------------------------------------------------
 # Input files
 #---------------------------------------------------------------------------
-INPUT                  = . \
-                        .. \
-                        ../src \
-                        ../include \
-                        ../README.md
+INPUT                  = app/{{ project_name }}/src \
+                        app/{{ project_name }}/include \
+                        lib/*/include \
+                        lib/*/src
 
 FILE_PATTERNS          = *.cpp \
                         *.h \
@@ -37,8 +44,7 @@ FILE_PATTERNS          = *.cpp \
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */build/* \
                         */test/* \
-                        */.cmake/* \
-                        */docs/*
+                        */.cmake/*
 USE_MDFILE_AS_MAINPAGE = README.md
 
 #---------------------------------------------------------------------------
@@ -62,6 +68,7 @@ HTML_FILE_EXTENSION    = .html
 HTML_COLORSTYLE_HUE   = 220
 HTML_COLORSTYLE_SAT   = 100
 HTML_COLORSTYLE_GAMMA = 80
+HTML_TIMESTAMP        = YES
 HTML_DYNAMIC_SECTIONS = NO
 GENERATE_TREEVIEW     = YES
 ENUM_VALUES_PER_LINE  = 4
@@ -83,6 +90,7 @@ INCLUDE_FILE_PATTERNS = *.h \
 #---------------------------------------------------------------------------
 HAVE_DOT             = YES
 DOT_NUM_THREADS      = 0
+CLASS_DIAGRAMS       = YES
 CLASS_GRAPH          = YES
 COLLABORATION_GRAPH  = YES
 GROUP_GRAPHS         = YES
@@ -91,10 +99,26 @@ UML_LIMIT_NUM_FIELDS = 50
 TEMPLATE_RELATIONS   = YES
 INCLUDE_GRAPH        = YES
 INCLUDED_BY_GRAPH    = YES
-CALL_GRAPH           = YES
-CALLER_GRAPH         = YES
+CALL_GRAPH          = NO
+CALLER_GRAPH        = NO
 GRAPHICAL_HIERARCHY  = YES
-DIRECTORY_GRAPH      = YES
-DOT_IMAGE_FORMAT     = SVG
-INTERACTIVE_SVG      = YES
-MAX_DOT_GRAPH_DEPTH = 0
+DIRECTORY_GRAPH     = YES
+
+#---------------------------------------------------------------------------
+# Output formats
+#---------------------------------------------------------------------------
+GENERATE_LATEX        = NO
+GENERATE_RTF         = NO
+GENERATE_MAN         = NO
+GENERATE_XML         = NO
+
+#---------------------------------------------------------------------------
+# Extra settings
+#---------------------------------------------------------------------------
+QUIET                = NO
+WARNINGS             = YES
+WARN_IF_UNDOCUMENTED = YES
+WARN_IF_DOC_ERROR    = YES
+WARN_NO_PARAMDOC     = YES
+WARN_FORMAT          = "$file:$line: $text"
+WARN_LOGFILE         = doxygen_warnings.log
