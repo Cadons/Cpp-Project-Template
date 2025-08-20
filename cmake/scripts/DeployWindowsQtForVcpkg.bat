@@ -6,11 +6,11 @@ if "%~1"=="" (
     exit /b 1
 )
 set "BUILD_DIR=%~1"
-set "LOCK_FILE=%BUILD_DIR%\%~3_QtDeploy.lock"
 set "WINDEPLOY_EXE=%~2"
 set "QML_DIR=%~4"
-set "TARGET_FILE_PATH=%~5"
 set "ARCH=x64"
+set "LOCK_FILE=%BUILD_DIR%\%~3_%~5_QtDeploy.lock"
+set "TARGET_FILE_PATH=%~6"
 
 if not exist "%LOCK_FILE%" (
     echo Creating lock file : "%LOCK_FILE%"
@@ -26,11 +26,11 @@ if not exist "%LOCK_FILE%" (
         set "QML_DEPLOY="
     )
 
-    echo "%BUILD_DIR%\vcpkg_installed\%ARCH%-windows\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
+    echo "%BUILD_DIR%\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
                   --force-openssl ^
                   %QML_DEPLOY% ^
                   "%TARGET_FILE_PATH%"
-    call "%BUILD_DIR%\vcpkg_installed\%ARCH%-windows\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
+    call "%BUILD_DIR%\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
          --force-openssl ^
          --qmldir "%QML_DIR%" ^
          "%TARGET_FILE_PATH%"
