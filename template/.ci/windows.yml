@@ -1,0 +1,63 @@
+# ====== CACHE ANCHORS ======
+.ci_cache_win: &ci_cache_win
+  cache:
+    - key: "ccache-win-${BUILD_TYPE}-${CI_COMMIT_REF_SLUG}"
+      policy: pull-push
+      paths:
+        - ".ccache/"
+
+# ====== WINDOWS TEMPLATES ======
+
+.build_template_windows:
+  stage: build-library
+  tags: [devops-win]
+  <<: *ci_cache_win
+  before_script:
+    # ccache
+    - New-Item -ItemType Directory -Force -Path .ccache | Out-Null
+    - $env:CCACHE_DIR="$env:CI_PROJECT_DIR\.ccache"
+    - $env:CCACHE_BASEDIR="$env:CI_PROJECT_DIR"
+    - $env:CCACHE_MAXSIZE="5G"
+    - $env:CCACHE_COMPILERCHECK="content"
+    - ccache -z
+
+    # Preset CMake
+    - Copy-Item .resources/ci/CMakePresetForCI.json -Destination CMakeUserPresets.json -Force
+  script:
+    # Config + launcher ccache
+    - cmake --preset "ci-win" -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+    - cmake --build --preset "$env:BUILD_PRESET"
+    - ccache -s
+#  artifacts:
+#    paths:
+#      - build/win/build/**_test/
+#      - build/win/CTestTestfile.cmake
+#      - build/win/**/CTestTestfile.cmake
+#      - build/win/CTestCustom.cmake
+#      - build/win/Testing/
+#      - build/win/DartConfiguration.tcl
+#      - build/win/CMakeCache.txt
+#      - build/win/**/*_tests.cmake
+#      - build/win/**/*_include.cmake
+#    expire_in: 1h
+
+.test_template_windows:
+  stage: test-library
+  tags: [devops-win]
+  before_script:
+    - $env:VCPKG_ROOT="D:\vcpkg"
+    - $env:PATH="$env:VCPKG_ROOT;$env:PATH"
+    - $env:CCACHE_DIR="$env:CI_PROJECT_DIR\.ccache"
+    - $env:CCACHE_BASEDIR="$env:CI_PROJECT_DIR"
+    - docker run -v ${PWD}\lib\pmysolutionapi:C:\data\ -p 3002:3002 --name mockoon_$CI_COMMIT_SHORT_SHA -d --rm mockoon-cli-win
+    - Start-Sleep -Seconds 20 # wait mockoon start
+  script:
+    - echo "Running tests..."
+    - cd build\win
+    - ctest --output-junit test_report.xml --output-on-failure
+  after_script:
+    - docker container stop mockoon_$CI_COMMIT_SHORT_SHA
+  artifacts:
+    reports:
+      junit: "build/win/test_report.xml"
+    expire_in: 1h

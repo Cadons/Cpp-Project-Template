@@ -36,8 +36,21 @@ def configure():
         toolchain_path = ""
         parent_preset=""
         if package_manager == "vcpkg":
+            console.print("[bold cyan]Have you already vcpkg dependecies installed? (y/n)[/bold cyan]")
             vcpkg_instance = VCPKGInitializer("")
             toolchain_path=vcpkg_instance.get_toolchain_file()
+            manifest_mode_status ="ON"
+            if input() == "y":
+                console.print("Insert toolchain file path (leave empty for default):")
+                toolchain_path = input()
+                manifest_mode_status ="OFF"
+                if len(toolchain_path) == 0:
+                        console.print("[bold yellow]No toolchain file path provided. Using default toolchain file.[/bold yellow]")
+                        manifest_mode_status ="ON"
+                elif not os.path.exists(toolchain_path):
+                    console.print("[bold red]Toolchain file not found. Please provide a valid toolchain file path.[/bold red]")
+                    return
+            toolchain_path=toolchain_path.replace("\\", "/")
             parent_preset = vcpkg_instance.get_parent_preset()
         else:
             console.print(f"[bold yellow]Package manager '{package_manager}' is not supported yet.[/bold yellow]")
@@ -47,7 +60,8 @@ def configure():
             console.print(f"[bold green]Using toolchain file: {toolchain_path}[/bold green]")
             PackageManager.generate_cmake_user_presets(
                 inherit_from=parent_preset,
-                toolchain_file=toolchain_path
+                toolchain_file=toolchain_path,
+                manifest_mode=manifest_mode_status
             )
         else:
             PackageManager.generate_cmake_user_presets()

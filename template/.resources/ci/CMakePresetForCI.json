@@ -8,8 +8,9 @@
             "binaryDir": "${sourceDir}/build/linux",
             "inherits": "vcpkg-default",
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "/vcpkg/scripts/buildsystems/vcpkg.cmake",
-                "VCPKG_TARGET_TRIPLET": "x64-linux"
+                "CMAKE_TOOLCHAIN_FILE": "/deps/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "x64-linux",
+                "VCPKG_MANIFEST_MODE": "OFF"
             }
         },
         {
@@ -19,8 +20,9 @@
             "binaryDir": "${sourceDir}/build/osx",
             "inherits": "vcpkg-default",
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "/Users/Shared/vcpkg/scripts/buildsystems/vcpkg.cmake",
-                "VCPKG_TARGET_TRIPLET": "arm64-osx"
+                "CMAKE_TOOLCHAIN_FILE": "/Users/Shared/deps/planner/0/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "arm64-osx",
+                "VCPKG_MANIFEST_MODE": "OFF"
             }
         },
         {
@@ -30,7 +32,8 @@
             "binaryDir": "${sourceDir}/build/win",
             "inherits": "vcpkg-default",
             "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": "D:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                "CMAKE_TOOLCHAIN_FILE": "D:/GitLab-Runner/deps/0/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_MANIFEST_MODE": "OFF"
             }
         }
     ],

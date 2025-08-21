@@ -1,0 +1,63 @@
+.ci_cache_linux: &ci_cache_linux
+  cache:
+    - key: "ccache-linux-${BUILD_TYPE}-${CI_COMMIT_REF_SLUG}"
+      policy: pull-push
+      paths:
+        - ".ccache/"
+
+variables:
+  VCPKG_FEATURE_FLAGS: "manifests,versions"
+
+
+# ===== BUILD (matrix Debug/Release) =====
+.build_template_linux:
+  stage: build-library
+  image: my.local.registry/vcpkg_builder
+  tags: [devops-linux]
+  <<: *ci_cache_linux
+  before_script:
+    - mkdir -p .ccache
+    - export CCACHE_DIR="${CI_PROJECT_DIR}/.ccache"
+    - export CCACHE_BASEDIR="${CI_PROJECT_DIR}"
+    - export CCACHE_MAXSIZE="5G"
+    - export CCACHE_COMPRESS="1"
+    - export CCACHE_NOHASHDIR="1"
+    - export CCACHE_SLOPPINESS="time_macros"
+    - export CCACHE_COMPILERCHECK="content"
+    - ccache -z || true
+  script:
+    - cmake -E copy .resources/ci/CMakePresetForCI.json CMakeUserPresets.json
+    - cmake --preset "ci-linux" -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+    - cmake --build  --preset "${BUILD_PRESET}" -j"$(nproc)"
+    - ccache -s || true
+  artifacts:
+    paths:
+      - build/linux/build/**_test/
+      - build/linux/CTestTestfile.cmake
+      - build/linux/**/CTestTestfile.cmake
+      - build/linux/CTestCustom.cmake
+      - build/linux/Testing/
+      - build/linux/DartConfiguration.tcl
+      - build/linux/CMakeCache.txt
+      - build/linux/**/*_tests.cmake
+      - build/linux/**/*_include.cmake
+    expire_in: 1h
+
+.test_template_linux:
+  stage: test-library
+  image: my.local.registry/vcpkg_builder
+  tags: [devops-linux]
+  before_script:
+    - export CCACHE_DIR="${CI_PROJECT_DIR}/.ccache"
+    - export CCACHE_BASEDIR="${CI_PROJECT_DIR}"
+  script:
+    - echo "Running tests..."
+    - mockoon-cli start --data lib/pmysolutionapi/mockoon_configuration.json &
+    - sleep 5 #wait mockoon initialization
+    - echo "Running tests..."
+    - cd build/linux
+    - ctest --output-junit test_report.xml --output-on-failure
+  artifacts:
+    reports:
+      junit: "build/linux/test_report.xml"
+    expire_in: 1d

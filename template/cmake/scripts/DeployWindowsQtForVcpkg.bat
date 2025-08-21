@@ -27,8 +27,6 @@ if not exist "%LOCK_FILE%" (
     if %QML_DIR%=="None" (
         set "QML_DEPLOY="
     )
-
-<<<<<<< HEAD
     echo "%QT_TOOLS_DIR%\tools\Qt6\bin\%WINDEPLOY_EXE%" ^
                   --force-openssl ^
                   %QML_DEPLOY% ^

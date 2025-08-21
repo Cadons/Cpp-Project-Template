@@ -73,7 +73,8 @@ function(auto_deploy_qt target_name)
         endif()
 
         # Set variables for build path and target file
-        set(BUILD_ROOT "${CMAKE_BINARY_DIR}")
+        set(BUILD_ROOT "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+
         set(TARGET_FILE_PATH $<TARGET_FILE:${target_name}>)
         if (QT_TOOLS_DIR)
             set(QT_TOOLS_DIR "${QT_TOOLS_DIR}")

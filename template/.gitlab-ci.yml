@@ -1,0 +1,108 @@
+stages:
+  - build
+  - test
+# - sign_software
+  - create_installer
+# - sign_installer
+# - deploy
+
+include:
+  - .ci/linux.yml
+  - .ci/windows.yml
+  - .ci/macos.yml
+.job_rules: &job_rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "main" || 
+           $CI_COMMIT_BRANCH == "dev" || 
+           $CI_COMMIT_BRANCH =~ /^release\//'
+      when: on_success
+    - changes:
+        - app/**/*.{cpp,h,hpp,mm}
+        - lib/**/*.{cpp,h,hpp}
+      when: manual
+    - when: never
+# =====================   app (Linux)   =====================
+build-linux:
+  extends: .build_template_linux
+  stage: build
+  <<: *job_rules
+  variables:
+    BUILD_TYPE: "Release"
+    BUILD_PRESET: "ci-linux-release"
+    TARGET: "app"
+
+
+# =====================   app (Windows)   =====================
+build-windows:
+  extends: .build_template_windows
+  stage: build
+  <<: *job_rules
+  variables:
+    BUILD_TYPE: "Release"
+    BUILD_PRESET: "ci-win-release"
+    TARGET: "app"
+# =====================   app (MacOs)   =====================
+build-macos:
+  extends: .build_template_macos
+  stage: build
+  <<: *job_rules
+  variables:
+    BUILD_TYPE: "Release"
+    BUILD_PRESET: "ci-osx-release"
+
+
+#====================   Test  =====================
+unit-test:
+  extends: .test_template_linux
+  stage: test
+  needs: ["build-linux"]
+  <<: *job_rules
+  variables:
+    BUILD_TYPE: "Release"
+
+#No test for windows, linux is enough
+#test-app-windows:release:
+#  extends: .test_template_windows
+#  stage: test
+#  needs: ["build-windows"]
+#  <<: *job_rules
+#  variables:
+#    BUILD_TYPE: "Release"
+
+#No test for macos, linux is enough
+#test-app-macos:release:
+#  extends: .test_template_macos
+#  stage: test
+#  needs: ["build-macos"]
+#  <<: *job_rules
+#  variables:
+#    BUILD_TYPE: "Release"
+
+##create-installer:
+#create-installer-windows:
+#  extends: .create_installer_template_windows
+#  stage: create_installer
+#  needs: ["build-windows"]
+#  rules:
+#  #only on tag on release branch
+#  - if: '$CI_COMMIT_TAG && $CI_COMMIT_BRANCH =~ /^release\//'
+#    when: on_success
+#  artifacts:
+#    paths:
+#      - build/win/installer
+#    expire_in: 1 hour
+#
+#create-installer-macos:
+#  extends: .create_installer_template_macos
+#  stage: create_installer
+#  needs: ["build-macos"]
+#  rules:
+#    #only on tag on release branch
+#    - if: '$CI_COMMIT_TAG && $CI_COMMIT_BRANCH =~ /^release\//'
+#      when: on_success
+#  artifacts:
+#    paths:
+#      - build/osx/installer
+#    expire_in: 1 hour

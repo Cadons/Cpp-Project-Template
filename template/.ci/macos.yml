@@ -1,0 +1,71 @@
+# ===== CACHE ANCHORS (macOS) =====
+.ci_cache_macos: &ci_cache_macos
+  cache:
+    - key: "ccache-osx-${BUILD_TYPE}-${CI_COMMIT_REF_SLUG}"
+      policy: pull-push
+      paths:
+        - ".ccache/"
+
+variables:
+  VCPKG_FEATURE_FLAGS: "manifests,versions"
+
+# ===== BUILD TEMPLATE (macOS) =====
+.build_template_macos:
+  stage: build-library
+  tags: [devops-osx]
+  <<: *ci_cache_macos
+  before_script:
+    - mkdir -p .ccache
+    - export CCACHE_DIR="${CI_PROJECT_DIR}/.ccache"
+    - export CCACHE_BASEDIR="${CI_PROJECT_DIR}"
+    - export CCACHE_MAXSIZE="5G"
+    - export CCACHE_COMPRESS="1"
+    - export CCACHE_NOHASHDIR="1"
+    - export CCACHE_SLOPPINESS="time_macros"
+    - export CCACHE_COMPILERCHECK="content"
+    - ccache -z || true
+  script:
+    - cmake -E copy .resources/ci/CMakePresetForCI.json CMakeUserPresets.json
+    - cmake --preset "ci-osx" -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+    - cmake --build --preset "${BUILD_PRESET}" -j"$(sysctl -n hw.logicalcpu)"
+    - ccache -s || true
+#  artifacts:
+#    paths:
+#      - build/osx/build/**_test/
+#      - build/osx/CTestTestfile.cmake
+#      - build/osx/**/CTestTestfile.cmake
+#      - build/osx/CTestCustom.cmake
+#      - build/osx/Testing/
+#      - build/osx/DartConfiguration.tcl
+#      - build/osx/CMakeCache.txt
+#      - build/osx/**/*_tests.cmake
+#      - build/osx/**/*_include.cmake
+#    expire_in: 1h
+
+# ===== TEST TEMPLATE (macOS) =====
+.test_template_macos:
+  stage: test-library
+  tags: [devops-osx]
+  <<: *ci_cache_macos
+  before_script:
+    - export CCACHE_DIR="${CI_PROJECT_DIR}/.ccache"
+    - export CCACHE_BASEDIR="${CI_PROJECT_DIR}"
+    - echo "Running tests..."
+    - |
+      docker run -v ${PWD}/lib/pmysolutionapi/mockoon_configuration.json:/data/mockoon_configuration.json \
+      -p 3002:3002 \
+      --name mockoon_${CI_COMMIT_SHORT_SHA:-default} \
+      -d --rm mockoon/cli \
+      --data /data/mockoon_configuration.json
+
+    - sleep 20
+  script:
+    - echo "Running tests..."
+    - cd build/osx
+    - ctest --output-junit test_report.xml --output-on-failure
+  after_script:
+    - docker container stop mockoon_$CI_COMMIT_SHORT_SHA
+  artifacts:
+    reports:
+      junit: "build/osx/test_report.xml"
+    expire_in: 1d

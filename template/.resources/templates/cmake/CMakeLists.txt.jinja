@@ -1,13 +1,12 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Common OPTIONAL)
-set(PROJECT_VERSION "1.0.0")
-get_version(${CMAKE_CURRENT_LIST_DIR}/project.json PROJECT_VERSION)
+get_version(${CMAKE_SOURCE_DIR}/project.json PROJECT_VERSION)
 message(STATUS "{{ project_name}} by {{ org_name | default('UnknownOrg') }} - ${PROJECT_VERSION}")
 cmake_minimum_required(VERSION {{ cmake_min_version | default("3.23") }})
 
 project({{ project_name }}
     VERSION ${PROJECT_VERSION}
-    DESCRIPTION "{{ project_description | default('My Project') }}"
+    DESCRIPTION "{{ project_description | default('MyProject') }}"
     LANGUAGES CXX
 )
 
@@ -32,8 +31,11 @@ endif()
 
 # Enable IDE folder grouping
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # Add extra cmake modules (optional)
-include(QtUtils OPTIONAL)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(Common OPTIONAL)
+include(QUtils OPTIONAL)
 
 # Testing
 include(CTest)

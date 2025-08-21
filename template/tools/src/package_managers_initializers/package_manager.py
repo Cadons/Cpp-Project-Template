@@ -105,7 +105,7 @@ class PackageManager(ABC):
 
         return generators
     @staticmethod
-    def generate_cmake_user_presets(inherit_from="",toolchain_file=None):
+    def generate_cmake_user_presets(inherit_from="",toolchain_file=None, manifest_mode="ON"):
         generators = PackageManager.list_generators()
         if not generators:
             console.print("[bold red]No CMake generators found.[/bold red]")
@@ -143,7 +143,8 @@ class PackageManager(ABC):
         })
         if toolchain_file:
             cmake_presets_json["configurePresets"][-1]["cacheVariables"]={
-                "CMAKE_TOOLCHAIN_FILE": toolchain_file
+                "CMAKE_TOOLCHAIN_FILE": toolchain_file,
+                "VCPKG_MANIFEST_MODE": manifest_mode
             }
         cmake_presets_json["buildPresets"].append({
             "name": f"{generator_name} Debug",
@@ -160,7 +161,7 @@ class PackageManager(ABC):
             "jobs": cpus,
         })
 
-        cmake_user_presets_path = os.path.abspath(os.path.join(__file__,"..","..","..","..", "CMakeUserPresets.json"))
+        cmake_user_presets_path = os.path.join(__file__,"..","..","..","..", "CMakeUserPresets.json")
         import json
         with open(cmake_user_presets_path, 'w') as f:
             json.dump(cmake_presets_json, f, indent=2)
